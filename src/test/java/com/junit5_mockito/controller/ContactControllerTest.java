@@ -1,5 +1,6 @@
 package com.junit5_mockito.controller;
 
+import com.fasterxml.jackson.annotation.JsonTypeId;
 import com.junit5_mockito.entity.Contact;
 import com.junit5_mockito.service.ContactService;
 import org.mockito.Mock;
@@ -8,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
@@ -67,6 +67,47 @@ class ContactControllerTest {
         Contact contact = new Contact(1L,"ajay");
         doNothing().when(contactService).deleteContact(contact);
         mockMvc.perform(delete("/delete")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(contact)))
+                .andExpect(status().isOk());
+    }
+
+    // ----------------------------------------------------------
+    @Test
+    public void saveContact_test() throws Exception{
+        Contact contact = new Contact(1L,"jaya");
+        when(contactService.saveContact(contact)).thenReturn(contact);
+        mockMvc.perform(post("/contact")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(contact)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getContactList_test() throws Exception{
+        List<Contact> contacts = Arrays.asList(new Contact(3L,"kalyan"));
+        when(contactService.getContactsList()).thenReturn(contacts);
+        mockMvc.perform(get("/contacts")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("ajay"));
+    }
+
+    @Test
+    void deleteContact_test() throws Exception {
+        Contact contact = new Contact(1L,"kabir");
+        doNothing().when(contactService);
+        mockMvc.perform(delete("delete")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(contact)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void updateContact_test() throws Exception {
+        Contact contact = new Contact(1L,"kalyan");
+        when(contactService.updateContactById(1L,contact)).thenReturn(contact);
+        mockMvc.perform(put("/contact/{id}",1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(contact)))
                 .andExpect(status().isOk());

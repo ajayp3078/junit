@@ -35,4 +35,10 @@ public class ContactController {
         contactService.deleteContact(contact);
         return ResponseEntity.status(HttpStatus.OK).body("Deleted successfully");
     }
+
+    @PutMapping
+    public ResponseEntity<Contact> updateContact(@PathVariable Long id,@RequestBody Contact contact){
+        Contact updateContactById = contactService.updateContactById(id, contact);
+        return ResponseEntity.ok(updateContactById);
+    }
 }

@@ -29,4 +29,10 @@ public class ContactService {
         contactRepository.delete(contact);
     }
 
+    public Contact updateContactById(Long id,Contact contact){
+        Contact existingContact = contactRepository.findById(id).orElse(null);
+        existingContact.setName(contact.getName());
+            return contactRepository.save(existingContact);
+    }
+
 }
